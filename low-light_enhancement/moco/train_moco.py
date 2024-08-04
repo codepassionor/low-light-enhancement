@@ -209,9 +209,8 @@ def main_worker(args):
     cudnn.benchmark = True
 
     # Data loading code
-    traindir_1 = os.path.join(args.data, "corrosion")
-    traindir_2 = os.path.join(args.data, "dented")
-    traindir_3 = os.path.join(args.data, "scratch")
+    traindir_1 = os.path.join(args.data, "low-light")
+    traindir_2 = os.path.join(args.data, "high-light")
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
@@ -247,10 +246,6 @@ def main_worker(args):
         traindir_2, loader.TwoCropsTransform(transforms.Compose(augmentation))
     )
 
-    train_dataset_3 = datasets.ImageFolder(
-        traindir_3, loader.TwoCropsTransform(transforms.Compose(augmentation))
-    )
-
     train_loader_1 = torch.utils.data.DataLoader(
         train_dataset_1,
         batch_size=args.batch_size,
@@ -267,13 +262,6 @@ def main_worker(args):
         drop_last=True,
     )
 
-    train_loader_3 = torch.utils.data.DataLoader(
-        train_dataset_3,
-        batch_size=args.batch_size,
-        shuffle=True,
-        pin_memory=True,
-        drop_last=True,
-    )
     loss = []
     acc1 = []
     acc5 = []
@@ -283,7 +271,7 @@ def main_worker(args):
         adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
-        a, b, c = train(train_loader_1, train_loader_2, train_loader_3, model, criterion, optimizer, epoch, args, device)
+        a, b, c = train(train_loader_1, train_loader_2, model, criterion, optimizer, epoch, args, device)
         loss.append(a)
         acc1.append(b)
         acc5.append(c)
@@ -314,7 +302,7 @@ def main_worker(args):
             f.write(f"{item}\n")
 
 
-def train(train_loader_1, train_loader_2, train_loader_3, model, criterion, optimizer, epoch, args, device):
+def train(train_loader_1, train_loader_2, model, criterion, optimizer, epoch, args, device):
     batch_time = AverageMeter("Time", ":6.3f")
     data_time = AverageMeter("Data", ":6.3f")
     losses = AverageMeter("Loss", ":.4e")
@@ -335,15 +323,15 @@ def train(train_loader_1, train_loader_2, train_loader_3, model, criterion, opti
     acc_1 = []
     acc_5 = []
     idx = 0
-    for (x, _), (y, _), (z, _) in zip(train_loader_1, train_loader_2, train_loader_3):
+    for (x, _), (y, _) in zip(train_loader_1, train_loader_2):
 
         # measure data loading time
         data_time.update(time.time() - end)
 
         # if args.gpu is not None:
 
-        qs = [t[0].to(device) for t in (x, y, z)]
-        ks = [t[1].to(device) for t in (x, y, z)]
+        qs = [t[0].to(device) for t in (x, y)]
+        ks = [t[1].to(device) for t in (x, y)]
 
         # compute output
         output, target = model(img1s=qs, img2s=ks)
