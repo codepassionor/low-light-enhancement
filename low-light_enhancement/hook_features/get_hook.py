@@ -2,7 +2,7 @@ import torch
 from diffusers import UNet2DConditionModel
 from utils.text_embedding import generate_text_embeddings
 
-class DistFeatureExtractor:
+class FeatureExtractor:
     def __init__(self, model):
         self.model = model
         self.features = []
