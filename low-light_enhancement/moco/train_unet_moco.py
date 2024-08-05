@@ -266,8 +266,6 @@ def main_worker(args):
         drop_last=True,
     )
     loss = []
-    acc1 = []
-    acc5 = []
     for epoch in range(args.start_epoch, args.epochs):
         # if args.distributed:
         #     train_sampler.set_epoch(epoch)
@@ -276,8 +274,7 @@ def main_worker(args):
         # train for one epoch
         a, b, c = train(train_loader_1, train_loader_2, model, criterion, optimizer, epoch, args, device)
         loss.append(a)
-        acc1.append(b)
-        acc5.append(c)
+
 
         if (epoch + 1) % 50 == 0:
             save_checkpoint(
@@ -294,14 +291,6 @@ def main_worker(args):
     # record and write the loss, acc1, acc5
     with open("loss.txt", "w", encoding="utf-8") as f:
         for item in loss:
-            f.write(f"{item}\n")
-
-    with open("acc1.txt", "w", encoding='utf-8') as f:
-        for item in acc1:
-            f.write(f"{item}\n")
-
-    with open("acc5.txt", "w", encoding='utf-8') as f:
-        for item in acc5:
             f.write(f"{item}\n")
 
 
