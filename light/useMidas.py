@@ -122,7 +122,6 @@ def load_models(config_path, device="cuda"):
 # 主要流程
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 假设你的图片和掩码已经加载
 image_path = r'G:\new_evaluation_data\2\fig.png'
 mask_path = r'G:\new_evaluation_data\2\mask.png'
 image = Image.open(image_path).convert("RGB")
